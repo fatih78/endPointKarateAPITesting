@@ -18,14 +18,13 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @AutoConfigureMockMvc
 public class RestTemplateTests {
     public final String BASIC_URL = "http://localhost:8000";
-    HttpHeaders headers = new HttpHeaders();
 
     @LocalServerPort
     public int port = 8000;
 
     @Autowired
     public TestRestTemplate restTemplate;
-//    or use TestRestTemplate restTemplate = new TestRestTemplate();
+    public HttpHeaders headers = new HttpHeaders();
 
     @Test
     //        restTemplate
