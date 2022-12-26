@@ -1,5 +1,7 @@
 package com.example.demo;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,7 +10,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.*;
-import org.springframework.web.client.RestTemplate;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -16,11 +17,15 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
 public class RestTemplateTests {
+    public final String BASIC_URL = "http://localhost:8000";
+    HttpHeaders headers = new HttpHeaders();
+
     @LocalServerPort
     public int port = 8000;
 
     @Autowired
-    private TestRestTemplate restTemplate;
+    public TestRestTemplate restTemplate;
+//    or use TestRestTemplate restTemplate = new TestRestTemplate();
 
     @Test
     //        restTemplate
@@ -76,16 +81,12 @@ public class RestTemplateTests {
     //        restTemplate
     public void endPointAddNewProduct() {
 
-        RestTemplate restTemplate = new RestTemplate();
-
-        String url = "http://localhost:8000/drinks";
         String requestJson = "{\n" + "  \"name\": \"test5\",\n" + "  \"sort\": \"alcoholic\",\n" + "  \"abv\": 0,\n" + "  \"email\" : \"test@gmail.com\",\n" + "  \"id\": 7,\n" + "  \"country\": \"NL\"\n" + "}";
-        HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         HttpEntity<String> entity = new HttpEntity<String>(requestJson, headers);
         ResponseEntity<String> result = restTemplate
-                .exchange(url, HttpMethod.POST, entity, String.class);
+                .exchange(BASIC_URL + "/drinks", HttpMethod.POST, entity, String.class);
 
         Assertions.assertEquals(201, result.getStatusCodeValue());
         System.out.println(result);
@@ -96,20 +97,38 @@ public class RestTemplateTests {
     //        restTemplate
     public void endPointDeleteProduct() {
 
-        RestTemplate restTemplate = new RestTemplate();
-
-        String url = "http://localhost:8000/drinks/4";
-        HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         HttpEntity<String> entity = new HttpEntity<String>(headers);
         ResponseEntity<String> result = restTemplate
-                .exchange(url, HttpMethod.DELETE, entity, String.class);
+                .exchange(BASIC_URL + "/drinks/4", HttpMethod.DELETE, entity, String.class);
 
         Assertions.assertEquals(204, result.getStatusCodeValue());
         System.out.println(result);
 
     }
 
+    @Test
+    //        restTemplate
+    public void endPointAddProduct() throws JSONException {
+        // create request body
+        JSONObject request = new JSONObject();
+        request.put("name", "test6");
+        request.put("sort", "alcoholic");
+        request.put("email", "test@gmail.com");
+        request.put("country", "NL");
+        request.put("id", "4");
+        request.put("abv", "0");
+
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<String> entity = new HttpEntity<String>(request.toString(),headers);
+        ResponseEntity<String> result = restTemplate
+                .exchange(BASIC_URL + "/drinks", HttpMethod.POST, entity, String.class);
+
+        Assertions.assertEquals(201, result.getStatusCodeValue());
+        System.out.println(result);
+
+    }
 
 }
